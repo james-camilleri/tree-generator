@@ -1,5 +1,62 @@
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
+const patterns = [
+  (id, foreground, background) => {
+    const pattern = document.createElementNS(SVG_NS, 'pattern')
+    pattern.setAttribute('id', id)
+
+    const width = randomBetween(1, 20)
+    const height = 10
+    pattern.setAttribute('width', width)
+    pattern.setAttribute('height', height)
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse')
+    pattern.setAttribute('patternTransform', `rotate(${randomBetween(0, 259)})`)
+
+    const fill = document.createElementNS(SVG_NS, 'rect')
+    fill.setAttribute('width', width)
+    fill.setAttribute('height', height)
+    fill.setAttribute('fill', background)
+    pattern.appendChild(fill)
+
+    const line = document.createElementNS(SVG_NS, 'line')
+    const position = randomBetween(0, width)
+    line.setAttribute('x1', position)
+    line.setAttribute('x2', position)
+    line.setAttribute('y1', 0)
+    line.setAttribute('y2', height)
+    line.setAttribute('stroke', foreground)
+    line.setAttribute('stroke-width', randomBetween(1, width - 1))
+    pattern.appendChild(line)
+
+    return pattern
+  },
+
+  (id, foreground, background) => {
+    const pattern = document.createElementNS(SVG_NS, 'pattern')
+    pattern.setAttribute('id', id)
+
+    const size = randomBetween(3, 50)
+    pattern.setAttribute('width', size)
+    pattern.setAttribute('height', size)
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse')
+
+    const fill = document.createElementNS(SVG_NS, 'rect')
+    fill.setAttribute('width', size)
+    fill.setAttribute('height', size)
+    fill.setAttribute('fill', background)
+    pattern.appendChild(fill)
+
+    const circle = document.createElementNS(SVG_NS, 'circle')
+    circle.setAttribute('cx', size / 2)
+    circle.setAttribute('cy', size / 2)
+    circle.setAttribute('r', randomBetween(1, size/ 2 - 1))
+    circle.setAttribute('fill', foreground)
+    pattern.appendChild(circle)
+
+    return pattern
+  }
+]
+
 function randomBetween (min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min
 }
@@ -22,11 +79,12 @@ function generateRandomisedPoints (points) {
     .join(' ')
 }
 
-function generateRandomPolygon (template, colour) {
+function generateRandomPolygon (template, fill) {
   const polygon = document.createElementNS(SVG_NS, 'polygon')
   polygon.setAttribute('points', generateRandomisedPoints(template))
-  polygon.setAttribute('fill', colour.foreground)
-  
+  polygon.setAttribute('fill', fill)
+  polygon.setAttribute('opacity', 0.8)
+
   return polygon
 }
 
@@ -68,13 +126,19 @@ function generateTree () {
   treeSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
   treeSvg.setAttribute('viewBox', '0 0 200 300')
 
-  // const colours = tinycolor.random().tetrad()
   const colourPairs = generateColourPairs()
-  console.log(colourPairs)
 
-  TREE.forEach((shape, i) => {
-    treeSvg.appendChild(generateRandomPolygon(shape, colourPairs[i]))
-  })
+  const defs = document.createElementNS(SVG_NS, 'defs')
+  for (let i = 1; i < 4; i++) {
+    const pattern = patterns[randomBetween(0, patterns.length - 1)]
+    defs.appendChild(pattern(`pattern-${i}`, colourPairs[i].foreground, colourPairs[i].background))
+  }
+  treeSvg.appendChild(defs)
+
+  treeSvg.appendChild(generateRandomPolygon(TREE[0], colourPairs[0].background))
+  for (let i = 1; i < 4; i++) {
+    treeSvg.appendChild(generateRandomPolygon(TREE[i], `url(#pattern-${i})`))
+  }
 
   document.querySelector('#tree').appendChild(treeSvg)
 }
@@ -85,7 +149,7 @@ function generateTree () {
 //             type: "image/svg+xml"
 //         }),
 //         url = window.URL.createObjectURL(blob);
-  
+
 //   clickedLinkElement.target = "_blank";
 //   clickedLinkElement.download = "Patterns.svg";
 //   clickedLinkElement.href = url;
