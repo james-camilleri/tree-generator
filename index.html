@@ -4,14 +4,17 @@
 <head>
   <meta charset="utf-8">
   <title>Christmas Tree</title>
+
+  <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 
 <body>
-  <div id="tree" style="width: 800px; height: 1200px;"></div>
+  <div id="tree"></div>
   <div class="button-container">
-    <button id="generate" onclick="generateTree()">Generate</button>
-    <a id="save">Save</a>
+    <button id="generate" class="button" onclick="generateTree()">Generate</button>
+    <a id="save" class="button">Save</a>
   </div>
+
   <script src="tinycolor-min.js"></script>
   <script src="tree.js"></script>
 </body>
