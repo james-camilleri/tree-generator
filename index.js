@@ -3,41 +3,24 @@ import patterns from './utils/patterns.js'
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
-// function generateColourPairs () {
-//   const colours = tinycolor({
-//     h: randomBetween(0, 360),
-//     s: randomBetween(70, 90),
-//     l: randomBetween(50, 70)
-//   }).analogous(4)
-
-//   const complements = colours.map(colour => tinycolor(colour).complement())
-
-//   return colours.reduce((pairs, colour, i) => {
-//     return [...pairs, {
-//       foreground: i % 2
-//         ? colours[i].spin(randomBetween(-10, 10))
-//         : complements[i].spin(randomBetween(-10, 10)),
-//       background: i % 2
-//         ? complements[i].spin(randomBetween(-10, 10))
-//         : colours[i].spin(randomBetween(-10, 10))
-//     }]
-//   }, [])
-// }
-
 function generateColourPairs () {
-  const colours = [tinycolor('#000'), tinycolor('#000'), tinycolor('#000'), tinycolor('#000')]
-  const complements = [tinycolor('#eee'), tinycolor('#eee'), tinycolor('#eee'), tinycolor('#eee')]
+  const backgrounds = tinycolor({
+    h: random.between(0, 359),
+    s: random.between(60, 70),
+    l: random.between(60, 70)
+  }).tetrad()
 
-  return colours.reduce((pairs, colour, i) => {
-    return [...pairs, {
-      foreground: i % 2
-        ? colours[i].spin(random.between(-10, 10))
-        : complements[i].spin(random.between(-10, 10)),
-      background: i % 2
-        ? complements[i].spin(random.between(-10, 10))
-        : colours[i].spin(random.between(-10, 10))
-    }]
-  }, [])
+  const foregrounds = backgrounds.map(
+    colour => colour.clone()
+      .darken(random.between(25, 35))
+      .saturate(random.between(15, 25))
+      .spin(random.between(10, 15) * (Math.random() > 0.5 ? 1 : -1))
+  )
+
+  return backgrounds.map((background, i) => ({
+    foreground: foregrounds[i],
+    background
+  }))
 }
 
 function generateTree () {
