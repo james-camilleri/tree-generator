@@ -2,11 +2,12 @@ import random from './utils/random.js'
 import patterns from './utils/patterns.js'
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
+let savedPatterns = 0
 
 function generateColourPairs () {
   const backgrounds = tinycolor({
     h: random.between(0, 359),
-    s: random.between(60, 70),
+    s: random.between(70, 80),
     l: random.between(60, 70)
   }).tetrad()
 
@@ -58,15 +59,15 @@ function generateTree () {
 
 // https://www.blustemy.io/making-svg-patterns-with-javascript/
 function updateSaveLink(svg) {
-  const link = document.querySelector('#save')
+  const link = document.getElementById('save')
   const blob = new Blob([svg], { type: "image/svg+xml" })
   const url = window.URL.createObjectURL(blob);
 
-  link.target = "_blank";
-  link.download = "tree.svg";
+  link.target = '_blank';
+  link.download = `christmas_tree_${savedPatterns}.svg`;
   link.href = url;
 }
 
-// Generate and inject a new tree.
 document.getElementById('generate').onclick = generateTree
+document.getElementById('save').onclick = () => savedPatterns++
 generateTree()
